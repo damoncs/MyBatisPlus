@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx" default-autowire="default"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="${dbcp.initialSize}" />
+		<property name="maxActive" value="${dbcp.maxActive}" />
+		<property name="minIdle" value="${dbcp.minIdle}" />
+		<property name="maxIdle" value="${dbcp.maxIdle}" />
+		<property name="maxWait" value="${dbcp.maxWait}" />
+		<property name="validationQuery" value="${dbcp.validationQuery}" />
+	</bean>
+
+	<!-- MyBatis SqlSessionFactoryBean 配置 -->
+	<bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:xml/mybatis-config.xml" />
+		<property name="typeAliasesPackage" value="com.baomidou.springwind.entity;com.baomidou.springwind.entity.vo" />
+		<property name="mapperLocations" value="classpath*:org/aries/mybatis/mapper/xml/**/*Mapper.xml" />
+		<property name="plugins">
+			<array>
+				<!-- 分页插件配置 -->
+				<bean id="paginationInterceptor" class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+					<property name="dialectType" value="mysql" />
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+		  p:basePackage="org.aries.mybatis.mapper"
+		  p:sqlSessionFactoryBeanName="sqlSessionFactory" />
+
+</beans>
